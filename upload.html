@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Envio de PDF para Análise com IA</title>
+</head>
+<body style="font-family: Arial; padding: 2em;">
+  <h2>📄 Enviar PDF para análise</h2>
+  <form id="uploadForm">
+    <input type="file" id="pdfFile" accept="application/pdf" required />
+    <br /><br />
+    <button type="submit">Enviar</button>
+  </form>
+
+  <h3>Resultado da Análise</h3>
+  <pre id="output" style="background: #f0f0f0; padding: 1em; border-radius: 4px;"></pre>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const fileInput = document.getElementById('pdfFile');
+      const file = fileInput.files[0];
+      if (!file) {
+        alert('Por favor, selecione um arquivo PDF.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async function () {
+        const base64 = reader.result.split(',')[1];
+        const payload = {
+          file: {
+            fileName: file.name,
+            mimeType: file.type,
+            data: base64
+          }
+        };
+
+        try {
+          const response = await fetch('https://ruirodrigues.app.n8n.cloud/webhook/131c39e5-b57d-4300-8bdf-7e7a4e5257c9', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const result = await response.json();
+          document.getElementById('output').textContent = JSON.stringify(result, null, 2);
+        } catch (err) {
+          document.getElementById('output').textContent = 'Erro ao enviar o arquivo: ' + err.message;
+        }
+      };
+
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
