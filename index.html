@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upload PDF MAPA</title>
+</head>
+<body>
+  <h2>Enviar PDF para Análise</h2>
+  <form id="uploadForm">
+    <input type="file" id="pdfFile" accept="application/pdf" required />
+    <button type="submit">Enviar</button>
+  </form>
+  <div id="status"></div>
+
+  <script>
+    const webhookUrl = "https://ruirodrigues.app.n8n.cloud/webhook/131c39e5-b57d-4300-8bdf-7e7a4e5257c9"; // seu webhook
+
+    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById("pdfFile");
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert("Por favor, selecione um arquivo PDF.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = async () => {
+        const base64Data = reader.result.split(",")[1];
+
+        const payload = {
+          file: {
+            fileName: file.name,
+            mimeType: file.type,
+            data: base64Data
+          }
+        };
+
+        document.getElementById("status").innerText = "Enviando PDF...";
+
+        try {
+          const response = await fetch(webhookUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const result = await response.json();
+          document.getElementById("status").innerText = "Arquivo enviado com sucesso!";
+          console.log(result);
+        } catch (err) {
+          console.error(err);
+          document.getElementById("status").innerText = "Erro ao enviar o arquivo.";
+        }
+      };
+
+      reader.readAsDataURL(file);
+    });
+  </script>
+</body>
+</html>
