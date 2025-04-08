@@ -1,65 +1,56 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Upload PDF MAPA</title>
+  <meta charset="UTF-8">
+  <title>Upload de PDF para Análise</title>
 </head>
 <body>
-  <h2>Enviar PDF para Análise</h2>
-  <form id="uploadForm">
-    <input type="file" id="pdfFile" accept="application/pdf" required />
-    <button type="submit">Enviar</button>
-  </form>
-  <div id="status"></div>
+  <h1>Enviar PDF para Análise</h1>
+  <input type="file" id="pdfFile" accept="application/pdf" />
+  <button onclick="enviarPDF()">Enviar</button>
 
   <script>
-    const webhookUrl = "https://ruirodrigues.app.n8n.cloud/webhook/131c39e5-b57d-4300-8bdf-7e7a4e5257c9"; // seu webhook
-
-    document.getElementById("uploadForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
+    async function enviarPDF() {
       const fileInput = document.getElementById("pdfFile");
       const file = fileInput.files[0];
-
       if (!file) {
-        alert("Por favor, selecione um arquivo PDF.");
+        alert("Selecione um arquivo PDF primeiro.");
         return;
       }
 
       const reader = new FileReader();
-      reader.onload = async () => {
-        const base64Data = reader.result.split(",")[1];
+      reader.onload = async function () {
+        const base64 = reader.result.split(',')[1];
 
-        const payload = {
+        const body = {
           file: {
+            data: base64,
             fileName: file.name,
-            mimeType: file.type,
-            data: base64Data
+            mimeType: file.type
           }
         };
 
-        document.getElementById("status").innerText = "Enviando PDF...";
+        const webhookUrl = "https://ruirodrigues.app.n8n.cloud/webhook/131c39e5-b57d-4300-8bdf-7e7a4e5257c9";
 
         try {
           const response = await fetch(webhookUrl, {
             method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify(payload)
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
           });
 
-          const result = await response.json();
-          document.getElementById("status").innerText = "Arquivo enviado com sucesso!";
-          console.log(result);
-        } catch (err) {
-          console.error(err);
-          document.getElementById("status").innerText = "Erro ao enviar o arquivo.";
+          if (response.ok) {
+            alert("Arquivo enviado com sucesso!");
+          } else {
+            alert("Erro ao enviar o arquivo.");
+          }
+        } catch (error) {
+          alert("Erro de rede: " + error);
         }
       };
 
       reader.readAsDataURL(file);
-    });
+    }
   </script>
 </body>
 </html>
