@@ -30,7 +30,8 @@
           }
         };
 
-        const webhookUrl = "https://ruirodrigues.app.n8n.cloud/webhook/131c39e5-b57d-4300-8bdf-7e7a4e5257c9";
+        // 🔁 URL via Proxy para evitar CORS
+        const webhookUrl = "https://n8n-proxy.replit.app/webhook/131c39e5-b57d-4300-8bdf-7e7a4e5257c9";
 
         try {
           const response = await fetch(webhookUrl, {
@@ -42,7 +43,7 @@
           if (response.ok) {
             alert("Arquivo enviado com sucesso!");
           } else {
-            alert("Erro ao enviar o arquivo.");
+            alert("Erro ao enviar o arquivo: " + response.statusText);
           }
         } catch (error) {
           alert("Erro de rede: " + error);
