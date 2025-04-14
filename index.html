@@ -30,8 +30,8 @@
           }
         };
 
-        // 🔁 URL via Proxy para evitar CORS
-        const webhookUrl = "https://n8n-proxy.replit.app/webhook/131c39e5-b57d-4300-8bdf-7e7a4e5257c9";
+        // ✅ Webhook atualizado com o proxy no Replit
+        const webhookUrl = "https://proxy-n8n-analisepdf-dnew.replit.app/enviar";
 
         try {
           const response = await fetch(webhookUrl, {
@@ -43,7 +43,7 @@
           if (response.ok) {
             alert("Arquivo enviado com sucesso!");
           } else {
-            alert("Erro ao enviar o arquivo: " + response.statusText);
+            alert("Erro ao enviar o arquivo.");
           }
         } catch (error) {
           alert("Erro de rede: " + error);
